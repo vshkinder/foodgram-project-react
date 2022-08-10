@@ -2,17 +2,15 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import (
-    IsAuthenticated, IsAuthenticatedOrReadOnly
-)
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 
 from .filters import RecipeFilter
 from .models import Favorite, Ingredient, Recipe, Shop_list, Tag
 from .permissions import IsAuthorOrAdminOrReadOnly
 from .serializers import (FavoriteSerializer, IngredientSerializer,
-                          RecipeSerializer, ShopListSerializer,
-                          TagSerializer)
+                          RecipeSerializer, ShopListSerializer, TagSerializer)
 from .utils import get_shopping_list
 
 

@@ -6,7 +6,7 @@ from rest_framework import serializers
 
 from users.models import CustomUser
 
-from .models import (Favorite, Ingredient, CountOfIngredient, Recipe,
+from .models import (CountOfIngredient, Favorite, Ingredient, Recipe,
                      Shop_list, Tag)
 
 

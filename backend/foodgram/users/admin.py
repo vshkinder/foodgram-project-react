@@ -1,7 +1,9 @@
 from django.contrib import admin
-from import_export.admin import ImportExportModelAdmin, ImportMixin
+from import_export.admin import ImportMixin
+
+from recipes.models import CountOfIngredient, Ingredient, Recipe, Tag
+
 from .models import CustomUser
-from recipes.models import Ingredient, Recipe, Tag, CountOfIngredient
 
 
 class UsersAdmin(admin.ModelAdmin):
