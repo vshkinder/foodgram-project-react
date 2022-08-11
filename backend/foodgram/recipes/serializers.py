@@ -6,19 +6,17 @@ from rest_framework import serializers
 
 from users.models import CustomUser
 
-from .models import (CountOfIngredient, Favorite, Ingredient, Recipe,
-                     Shop_list, Tag)
+from .models import (CountOfIngredient, Favorite, Ingredient, Recipe, Shoplist,
+                     Tag)
 
 
 class AuthorSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = CustomUser
         fields = ('email', 'id', 'username', 'first_name', 'last_name',)
 
 
 class IngredientSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Ingredient
         fields = ('id', 'name', 'measurement_unit',)
@@ -88,7 +86,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         if callname_function == 'get_is_favorited':
             init_queryset = Favorite.objects.filter(recipe=data.id, user=user)
         elif callname_function == 'get_is_in_shopping_cart':
-            init_queryset = Shop_list.objects.filter(recipe=data, user=user)
+            init_queryset = Shoplist.objects.filter(recipe=data, user=user)
         if init_queryset.exists():
             return True
         return False
@@ -208,5 +206,5 @@ class ShopListSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = Shop_list
+        model = Shoplist
         fields = ('id', 'cooking_time', 'name', 'image')

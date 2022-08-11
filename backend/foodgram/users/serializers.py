@@ -53,7 +53,9 @@ class UserSubscribeSerializer(serializers.ModelSerializer, IsSubscribedMixin):
         author = data['subscribing']
         user = data['subscriber']
         if user == author:
-            raise serializers.ValidationError('Вы не можете подписаться на себя.')
+            raise serializers.ValidationError(
+                'Вы не можете подписаться на себя.'
+            )
         if Subscribe.objects.filter(author=author, user=user).exists():
             raise serializers.ValidationError('Вы уже подписаны!')
         return data

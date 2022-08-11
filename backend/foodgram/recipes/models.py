@@ -211,7 +211,7 @@ class Favorite(models.Model):
         return f'{self.user} -> {self.recipe}'
 
 
-class Shop_list(models.Model):
+class Shoplist(models.Model):
     user = models.OneToOneField(
         CustomUser,
         on_delete=models.CASCADE,

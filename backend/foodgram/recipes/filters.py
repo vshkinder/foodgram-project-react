@@ -3,7 +3,7 @@ from django_filters.rest_framework import (AllValuesMultipleFilter,
                                            BooleanFilter, CharFilter,
                                            FilterSet)
 
-from .models import Ingredient, Recipe, Shop_list
+from .models import Ingredient, Recipe, Shoplist
 
 
 class IngredientSearchFilter(FilterSet):
@@ -55,7 +55,7 @@ class RecipeFilter(FilterSet):
             recipes = (
                 self.request.user.shopping_cart.recipes.all()
             )
-        except Shop_list.DoesNotExist:
+        except Shoplist.DoesNotExist:
             return queryset
         return queryset.filter(
             pk__in=(recipe.pk for recipe in recipes)

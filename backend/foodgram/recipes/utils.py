@@ -1,10 +1,10 @@
 from django.http import HttpResponse
 
-from .models import Shop_list
+from .models import Shoplist
 
 
 def get_shopping_list(request):
-    shopping_cart = Shop_list.objects.filter(user=request.user).all()
+    shopping_cart = Shoplist.objects.filter(user=request.user).all()
     shopping_list = {}
     for item in shopping_cart:
         for recipe_ingredient in item.recipe.recipe_ingredients.all():

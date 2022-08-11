@@ -67,7 +67,9 @@ class CustomUserViewSet(UserViewSet):
     )
     def subscriptions(self, request):
         current_user = request.user
-        followed_list = CustomUser.objects.filter(subscribing__user=current_user)
+        followed_list = CustomUser.objects.filter(
+            subscribing__user=current_user
+        )
         paginator = PageNumberPagination()
         paginator.page_size_query_param = 'limit'
         authors = paginator.paginate_queryset(

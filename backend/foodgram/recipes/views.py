@@ -7,7 +7,7 @@ from rest_framework.permissions import (IsAuthenticated,
 from rest_framework.response import Response
 
 from .filters import RecipeFilter
-from .models import Favorite, Ingredient, Recipe, Shop_list, Tag
+from .models import Favorite, Ingredient, Recipe, Shoplist, Tag
 from .permissions import IsAuthorOrAdminOrReadOnly
 from .serializers import (FavoriteSerializer, IngredientSerializer,
                           RecipeSerializer, ShopListSerializer, TagSerializer)
@@ -57,7 +57,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = get_object_or_404(Recipe, pk=pk)
         user = request.user
         if request.method == 'GET':
-            recipe, created = Shop_list.objects.get_or_create(
+            recipe, created = Shoplist.objects.get_or_create(
                 user=user, recipe=recipe
             )
             if created is True:
@@ -71,7 +71,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_201_CREATED
             )
         if request.method == 'DELETE':
-            Shop_list.objects.filter(
+            Shoplist.objects.filter(
                 user=user, recipe=recipe
             ).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
