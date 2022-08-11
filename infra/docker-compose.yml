@@ -19,7 +19,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ../frontend/:/app/result_build/
-  backend:
+  web:
     image: vshkinder11/foodgram:latest
     restart: always
     volumes:
@@ -40,5 +40,5 @@ services:
       - static_value:/app/backend_static/
       - media_value:/app/backend_media/
     depends_on:
-      - backend
+      - web
       - frontend

@@ -22,7 +22,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          context: foodgram
+          context: backend/foodgram
           tags: vshkinder11/foodgram:latest
 
   deploy:
