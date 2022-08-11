@@ -14,11 +14,10 @@ services:
     env_file:
       - ./.env
   frontend:
-    build:
-      context: ../foodgram-project-react/frontend
-      dockerfile: Dockerfile
+    image: vshkinder11/frontend:latest
+    container_name: frontend
     volumes:
-      - ../foodgram-progect-react/frontend/:/app/result_build/
+      - ../frontend/:/app/result_build/
   web:
     image: vshkinder11/foodgram:latest
     restart: always
