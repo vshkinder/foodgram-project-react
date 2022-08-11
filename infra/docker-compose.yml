@@ -12,7 +12,7 @@ services:
     volumes:
       - ./postgres_data:/var/lib/postgresql/data/
     env_file:
-      - ../backend/foodgram/.env
+      - ./.env
   frontend:
     build:
       context: ../frontend
@@ -28,7 +28,7 @@ services:
     depends_on:
       - db
     env_file:
-      - ../backend/foodgram/.env
+      - ./.env
   nginx:
     image: nginx:1.19.3
     ports:
