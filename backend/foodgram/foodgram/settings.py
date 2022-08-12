@@ -43,13 +43,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'djoser',
-    'users.apps.UsersConfig',
-    'recipes.apps.RecipesConfig',
-    'about.apps.AboutConfig',
     'rest_framework',
     'django_filters',
     'rest_framework.authtoken',
     'import_export',
+    'users.apps.UsersConfig',
+    'recipes.apps.RecipesConfig',
+    'about.apps.AboutConfig',
 ]
 
 MIDDLEWARE = [
