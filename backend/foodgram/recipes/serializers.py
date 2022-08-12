@@ -72,14 +72,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = (
-            'name',
-            'text',
-            'ingredients',
-            'cooking_time',
-            'image',
-            'tags'
-        )
+        exclude = ('pub_date',)
 
     def get_status_func(self, data):
         request = self.context.get('request')
