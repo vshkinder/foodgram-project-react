@@ -80,7 +80,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             'image',
             'tags'
         )
-        exclude = ('pub_date',)
 
     def get_status_func(self, data):
         request = self.context.get('request')
