@@ -3,14 +3,14 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import (IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
+                                        IsAuthenticatedOrReadOnly, SAFE_METHODS)
 from rest_framework.response import Response
 
 from .filters import RecipeFilter
 from .models import Favorite, Ingredient, Recipe, Shoplist, Tag
 from .permissions import IsAuthorOrAdminOrReadOnly
 from .serializers import (FavoriteSerializer, IngredientSerializer,
-                          RecipeSerializer, ShopListSerializer, TagSerializer)
+                          RecipeReadSerializer, RecipeWriteSerializer, ShopListSerializer, TagSerializer)
 from .utils import get_shopping_list
 
 
@@ -18,8 +18,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     filter_backends = [DjangoFilterBackend]
     filter_class = RecipeFilter
-    serializer_class = RecipeSerializer
     permission_classes = [IsAuthorOrAdminOrReadOnly]
+
+    def get_serializer_class(self):
+        if self.request.method in SAFE_METHODS:
+            return RecipeReadSerializer
+        return RecipeWriteSerializer
 
     @action(
         detail=True,
