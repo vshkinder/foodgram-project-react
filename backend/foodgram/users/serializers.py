@@ -2,7 +2,7 @@ from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers, validators
 
 from recipes.models import Recipe
-from recipes.serializers import RecipeSerializer
+from recipes.serializers import RecipeReadSerializer
 
 from .mixins import IsSubscribedMixin
 from .models import CustomUser, Subscribe
@@ -74,5 +74,5 @@ class UserSubscribeSerializer(serializers.ModelSerializer, IsSubscribedMixin):
             data.recipes.all()[:int(recipes_limit)]
             if recipes_limit else data.recipes
         )
-        serializer = serializers.ListSerializer(child=RecipeSerializer())
+        serializer = serializers.ListSerializer(child=RecipeReadSerializer())
         return serializer.to_representation(recipes)
