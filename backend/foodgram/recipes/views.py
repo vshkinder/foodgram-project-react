@@ -37,18 +37,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if user.is_anonymous:
             return queryset
 
-        is_in_shopping = self.request.query_params.get('is_in_shopping_cart')
-        if is_in_shopping in ('1', 'true',):
-            queryset = queryset.filter(cart=user.id)
-        elif is_in_shopping in ('0', 'false',):
-            queryset = queryset.exclude(cart=user.id)
-
-        is_favorited = self.request.query_params.get('is_favorited')
-        if is_favorited in ('1', 'true',):
-            queryset = queryset.filter(favorite=user.id)
-        if is_favorited in ('0', 'false',):
-            queryset = queryset.exclude(favorite=user.id)
-
         return queryset
 
     @action(methods=('GET', 'POST', 'DELETE'), detail=True)
