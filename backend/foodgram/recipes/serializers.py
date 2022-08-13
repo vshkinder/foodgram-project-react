@@ -246,7 +246,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def get_ingredients(self, obj):
         ingredients = obj.ingredients.values(
-            'id', 'name', 'measurement_unit', amount=F('recipes__amount')
+            'id', 'name', 'measurement_unit', amount=F('recipes__recipe_ingredients')
         )
         return ingredients
 
