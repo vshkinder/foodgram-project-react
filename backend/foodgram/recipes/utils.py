@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from rest_framework.serializers import ValidationError
 
 from .models import Shoplist
 
@@ -30,3 +31,17 @@ def get_shopping_list(request):
         'attachment; filename={0}'.format(filename)
     )
     return response
+
+
+def check_value_validate(value, klass=None):
+    if not str(value).isdecimal():
+        raise ValidationError(
+            f'{value} должно содержать цифру'
+        )
+    if klass:
+        obj = klass.objects.filter(id=value)
+        if not obj:
+            raise ValidationError(
+                f'{value} не существует'
+            )
+        return obj[0]

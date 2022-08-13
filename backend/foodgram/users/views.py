@@ -66,7 +66,7 @@ class CustomUserViewSet(UserViewSet):
         url_path='subscriptions'
     )
     def subscriptions(self, request):
-        current_user = request.user
+        current_user = self.request.user
         followed_list = CustomUser.objects.filter(
             subscribing__user=current_user
         )
