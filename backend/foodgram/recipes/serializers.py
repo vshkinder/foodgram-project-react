@@ -12,7 +12,7 @@ from users.models import CustomUser
 from users.serializers import UserSerializer
 
 from .models import (CountOfIngredient, Favorite, Ingredient, Recipe, Shoplist,
-                     Tag)
+                     Tag, RecipesFavorite)
 from .utils import check_value_validate
 
 
@@ -250,17 +250,31 @@ class RecipeSerializer(serializers.ModelSerializer):
         )
         return ingredients
 
+    def get_status_func(self, data):
+        request = self.context.get('request')
+        if request is None or request.user.is_anonymous:
+            return False
+        try:
+            user = self.context.get('request').user
+        except:
+            user = self.context.get('user')
+        callname_function = format(traceback.extract_stack()[-2][2])
+        if callname_function == 'get_is_favorited':
+            init_queryset = RecipesFavorite.objects.filter(recipe=data.id, user=user)
+        elif callname_function == 'get_is_in_shopping_cart':
+            init_queryset = Shoplist.objects.filter(recipe=data, user=user)
+        if init_queryset.exists():
+            return True
+        return False
+
     def get_is_favorited(self, obj):
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
         return user.favorites.filter(id=obj.id).exists()
 
-    def get_is_in_shopping_cart(self, obj):
-        user = self.context.get('request').user
-        if user.is_anonymous:
-            return False
-        return user.carts.filter(id=obj.id).exists()
+    def get_is_in_shopping_cart(self, data):
+        return self.get_status_func(data)
 
     def validate(self, data):
         name = str(self.initial_data.get('name')).strip()
