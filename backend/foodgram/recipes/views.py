@@ -16,30 +16,18 @@ from .utils import get_shopping_list
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    queryset = Recipe.objects.select_related('author')
+    queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     filter_backends = [DjangoFilterBackend]
     filter_class = RecipeFilter
     permission_classes = [IsAuthorOrAdminOrReadOnly]
 
-    def get_queryset(self):
-        queryset = self.queryset
-        tags = self.request.query_params.getlist('tags')
-        if tags:
-            queryset = queryset.filter(
-                tags__slug__in=tags).distinct()
-
-        author = self.request.query_params.get('author')
-        if author:
-            queryset = queryset.filter(author=author)
-
-        user = self.request.user
-        if user.is_anonymous:
-            return queryset
-
-        return queryset
-
-    @action(methods=('GET', 'POST', 'DELETE'), detail=True)
+    @action(
+        detail=True,
+        methods=['GET', 'DELETE'],
+        permission_classes=[IsAuthenticatedOrReadOnly],
+        url_path='favorite'
+    )
     def favorite(self, request, pk):
         recipe = get_object_or_404(Recipe, pk=pk)
         user = request.user
@@ -61,6 +49,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
+    @action(
+        detail=True,
+        methods=['GET', 'DELETE'],
+        permission_classes=[IsAuthenticatedOrReadOnly]
+    )
     def shopping_cart(self, request, pk):
         recipe = get_object_or_404(Recipe, pk=pk)
         user = request.user
