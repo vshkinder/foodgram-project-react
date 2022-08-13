@@ -148,7 +148,7 @@ class CountOfIngredient(models.Model):
         related_name='recipe_ingredients',
         verbose_name='Рецепт',
     )
-    ingredient = models.ForeignKey(
+    ingredients = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
         related_name='recipe_ingredients',
@@ -171,7 +171,7 @@ class CountOfIngredient(models.Model):
         ordering = ('-id',)
         constraints = (
             models.UniqueConstraint(
-                fields=('ingredient', 'recipe',),
+                fields=('ingredients', 'recipe',),
                 name='unique_ingredient_amount',
             ),
         )
