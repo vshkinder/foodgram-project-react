@@ -103,32 +103,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(methods=('get',), detail=False)
     def download_shopping_cart(self, request):
-        user = self.request.user
-        if not user.carts.exists():
-            return Response(status=HTTP_400_BAD_REQUEST)
-        ingredients = CountOfIngredient.objects.filter(
-            recipe__in=(user.carts.values('id'))
-        ).values(
-            ingredient=F('ingredients__name'),
-            measure=F('ingredients__measurement_unit')
-        ).annotate(amount=Sum('amount'))
-
-        filename = f'{user.username}_shopping_list.txt'
-        shopping_list = (
-            f'Список покупок для:\n\n{user.first_name}\n\n'
-        )
-        for ing in ingredients:
-            shopping_list += (
-                f'{ing["ingredient"]}: {ing["amount"]} {ing["measure"]}\n'
-            )
-
-        shopping_list += '\n\nПосчитано в Foodgram'
-
-        response = HttpResponse(
-            shopping_list, content_type='text.txt; charset=utf-8'
-        )
-        response['Content-Disposition'] = f'attachment; filename={filename}'
-        return response
+        try:
+            return get_shopping_list(request)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class IngredientsViewSet(viewsets.ModelViewSet):
