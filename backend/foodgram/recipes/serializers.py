@@ -17,7 +17,7 @@ class GetIsSubscribedMixin:
         user = self.context['request'].user
         if not user.is_authenticated:
             return False
-        return user.follower.filter(author=obj).exists()
+        return user.subscriber.filter(author=obj).exists()
 
 
 class RecipeUserSerializer(
