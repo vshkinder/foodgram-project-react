@@ -83,9 +83,9 @@ class FavoriteSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        recipe_favorite = CountOfIngredient.objects.create(**validated_data)
-        recipe_favorite.save()
-        return recipe_favorite
+        recipes_favorite = CountOfIngredient.objects.create(**validated_data)
+        recipes_favorite.save()
+        return recipes_favorite
 
     class Meta:
         model = RecipesFavorite

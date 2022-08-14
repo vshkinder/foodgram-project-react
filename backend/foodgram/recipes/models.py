@@ -184,14 +184,15 @@ class CountOfIngredient(models.Model):
 
 
 class Shoplist(models.Model):
-    user = models.OneToOneField(
+    user = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
         related_name='shopping_cart',
         verbose_name='Пользователь',
     )
-    recipe = models.ManyToManyField(
+    recipe = models.ForeignKey(
         Recipe,
+        on_delete=models.CASCADE,
         related_name='is_in_shopping_cart',
         verbose_name='Рецепты',
     )
@@ -202,7 +203,7 @@ class Shoplist(models.Model):
         ordering = ('-id',)
         constraints = [
             models.UniqueConstraint(
-                fields=['user'],
+                fields=['recipe', 'user'],
                 name='unique_recipe_cart'
             )
         ]

@@ -9,7 +9,7 @@ from rest_framework.status import HTTP_400_BAD_REQUEST
 
 from .filters import RecipeFilter
 from .models import Ingredient, Recipe, Shoplist, Tag, RecipesFavorite, CountOfIngredient
-from .permissions import IsAuthorOrAdminOrReadOnly
+from .permissions import IsAuthorOrAdminOrReadOnly, AuthorOrReadOnly
 from .serializers import (FavoriteSerializer, IngredientSerializer,
                           RecipeSerializer, ShopListSerializer, TagSerializer)
 from .utils import get_shopping_list
@@ -20,7 +20,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializer
     filter_backends = [DjangoFilterBackend]
     filter_class = RecipeFilter
-    permission_classes = [IsAuthorOrAdminOrReadOnly]
+    permission_classes = [AuthorOrReadOnly]
 
     @action(
         detail=True,
@@ -32,13 +32,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = get_object_or_404(Recipe, pk=pk)
         user = request.user
         if request.method == 'POST':
-            favorite_recipe, created = RecipesFavorite.objects.get_or_create(
+            recipes_favorite, created = RecipesFavorite.objects.get_or_create(
                 user=user, recipe=recipe
             )
             if created is True:
                 serializer = FavoriteSerializer()
                 return Response(
-                    serializer.to_representation(instance=favorite_recipe),
+                    serializer.to_representation(instance=recipes_favorite),
                     status=status.HTTP_201_CREATED
                 )
         if request.method == 'DELETE':
