@@ -21,7 +21,7 @@ class FollowsAdmin(admin.ModelAdmin):
 
 
 class RecipesAdmin(admin.ModelAdmin):
-    list_display = ('name', 'author', 'count_recipes_favorite')
+    list_display = ('name', 'author', 'count_recipes_favorite', 'image')
     list_filter = ('name', 'author', 'tags')
     search_fields = ('name', 'author', 'tags')
     empty_value_display = "-пусто-"
