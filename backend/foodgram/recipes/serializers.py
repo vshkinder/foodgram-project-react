@@ -241,7 +241,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         )
         read_only_fields = (
             'is_favorite',
-            'is_shopping_cart',
+            'is_in_shopping_cart',
         )
 
     def get_ingredients(self, obj):
@@ -271,7 +271,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
-        return user.favorites.filter(id=obj.id).exists()
+        return user.recipes_favorite.filter(id=obj.id).exists()
 
     def get_is_in_shopping_cart(self, data):
         return self.get_status_func(data)
