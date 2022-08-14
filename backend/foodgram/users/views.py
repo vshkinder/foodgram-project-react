@@ -61,7 +61,7 @@ class CustomUserViewSet(UserViewSet):
 
     @action(
         detail=True,
-        methods=['GET'],
+        methods=['POST'],
         permission_classes=[IsAuthenticated],
         url_path='subscriptions'
     )
