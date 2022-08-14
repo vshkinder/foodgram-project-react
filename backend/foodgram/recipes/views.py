@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
 from .filters import RecipeFilter
-from .models import Favorite, Ingredient, Recipe, Shoplist, Tag, RecipesFavorite, CountOfIngredient
+from .models import Ingredient, Recipe, Shoplist, Tag, RecipesFavorite, CountOfIngredient
 from .permissions import IsAuthorOrAdminOrReadOnly
 from .serializers import (FavoriteSerializer, IngredientSerializer,
                           RecipeSerializer, ShopListSerializer, TagSerializer)

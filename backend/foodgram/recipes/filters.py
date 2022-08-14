@@ -3,7 +3,7 @@ from django_filters.rest_framework import (AllValuesMultipleFilter,
                                            BooleanFilter, CharFilter,
                                            FilterSet)
 
-from .models import Ingredient, Recipe, Shoplist
+from .models import Ingredient, Recipe, Shoplist, RecipesFavorite
 
 
 class IngredientSearchFilter(FilterSet):
@@ -43,7 +43,7 @@ class RecipeFilter(FilterSet):
     def get_is_favorited(self, queryset, name, value):
         if not value:
             return queryset
-        favorites = self.request.user.favorites.all()
+        favorites = self.request.user.recipe_favotite.all()
         return queryset.filter(
             pk__in=(favorite.recipe.pk for favorite in favorites)
         )

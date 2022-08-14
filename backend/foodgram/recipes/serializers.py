@@ -11,7 +11,7 @@ from rest_framework.fields import SerializerMethodField
 from users.models import CustomUser
 from users.serializers import UserSerializer
 
-from .models import (CountOfIngredient, Favorite, Ingredient, Recipe, Shoplist,
+from .models import (CountOfIngredient, Ingredient, Recipe, Shoplist,
                      Tag, RecipesFavorite)
 from .utils import check_value_validate
 
@@ -190,7 +190,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
         return recipe_favorite
 
     class Meta:
-        model = Favorite
+        model = RecipesFavorite
         fields = ('id', 'cooking_time', 'name', 'image')
 
 
