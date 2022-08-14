@@ -178,8 +178,8 @@ class CountOfIngredient(models.Model):
 
     def __str__(self):
         return (
-            f'{self.ingredient.name} - {self.amount}'
-            f' ({self.ingredient.measurement_unit})'
+            f'{self.ingredients.name} - {self.amount}'
+            f' ({self.ingredients.measurement_unit})'
         )
 
 
@@ -220,7 +220,7 @@ class Shoplist(models.Model):
     )
     recipe = models.ManyToManyField(
         Recipe,
-        related_name='in_shopping_cart',
+        related_name='is_in_shopping_cart',
         verbose_name='Рецепты',
     )
 
@@ -228,7 +228,3 @@ class Shoplist(models.Model):
         verbose_name = 'Список покупок'
         verbose_name_plural = 'Списки покупок'
         ordering = ('-id',)
-
-    def __str__(self):
-        list_ = [item['name'] for item in self.recipe.values('name')]
-        return f'Пользователь {self.user} добавил список {list_} в покупки.'
