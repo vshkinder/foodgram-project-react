@@ -1,19 +1,14 @@
 import traceback
 
 from django.db import IntegrityError
-from django.db.models import F
-from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
-from rest_framework.serializers import ValidationError
 from rest_framework.fields import SerializerMethodField
 
 from users.models import CustomUser
-from users.serializers import UserSerializer
 
 from .models import (CountOfIngredient, Ingredient, Recipe, Shoplist,
                      Tag, RecipesFavorite, TagsRecipe)
-from .utils import check_value_validate
 
 
 class AuthorSerializer(serializers.ModelSerializer):
@@ -83,9 +78,9 @@ class FavoriteSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        recipes_favorite = CountOfIngredient.objects.create(**validated_data)
-        recipes_favorite.save()
-        return recipes_favorite
+        favorite = CountOfIngredient.objects.create(**validated_data)
+        favorite.save()
+        return favorite
 
     class Meta:
         model = RecipesFavorite
@@ -116,30 +111,26 @@ class ShopListSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(
+        required=True,
+    )
     tags = TagSerializer(many=True, read_only=True)
-    author = UserSerializer(read_only=True)
-    ingredients = SerializerMethodField()
+    author = AuthorSerializer(read_only=True)
+    ingredients = CountOfIngredientSerializer(
+        many=True, source='recipe_ingredients'
+    )
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
     image = Base64ImageField(
         max_length=None,
         use_url=True,
     )
+    text = serializers.CharField()
+    cooking_time = serializers.IntegerField(max_value=32767, min_value=1)
 
     class Meta:
         model = Recipe
-        fields = (
-            'id',
-            'tags',
-            'author',
-            'ingredients',
-            'is_favorited',
-            'is_in_shopping_cart',
-            'name',
-            'image',
-            'text',
-            'cooking_time',
-        )
+        exclude = ('pub_date',)
         read_only_fields = (
             'is_favorite',
             'is_in_shopping_cart',
@@ -167,39 +158,6 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def get_is_in_shopping_cart(self, data):
         return self.get_status_func(data)
-
-    #def validate(self, data):
-    #    name = str(self.initial_data.get('name')).strip()
-    #    tags = self.initial_data.get('tags')
-    #    ingredients = self.initial_data.get('ingredients')
-    #    values_as_list = (tags, ingredients)
-#
-    #    for value in values_as_list:
-    #        if not isinstance(value, list):
-    #            raise ValidationError(
-    #                f'"{value}" должен быть в формате "[]"'
-    #            )
-#
-    #    for tag in tags:
-    #        check_value_validate(tag, Tag)
-#
-    #    valid_ingredients = []
-    #    for ing in ingredients:
-    #        ing_id = ing.get('id')
-    #        ingredient = check_value_validate(ing_id, Ingredient)
-#
-    #        amount = ing.get('amount')
-    #        check_value_validate(amount)
-#
-    #        valid_ingredients.append(
-    #            {'ingredient': ingredient, 'amount': amount}
-    #        )
-#
-    #    data['name'] = name.capitalize()
-    #    data['tags'] = tags
-    #    data['ingredients'] = valid_ingredients
-    #    data['author'] = self.context.get('request').user
-    #    return data
 
     def create(self, validated_data):
         context = self.context['request']

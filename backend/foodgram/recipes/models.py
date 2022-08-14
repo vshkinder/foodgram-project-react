@@ -193,7 +193,7 @@ class Shoplist(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='is_in_shopping_cart',
+        related_name='shopping_cart',
         verbose_name='Рецепты',
     )
 
