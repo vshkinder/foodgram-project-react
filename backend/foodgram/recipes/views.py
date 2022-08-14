@@ -24,14 +24,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(
         detail=True,
-        methods=['GET', 'DELETE'],
+        methods=['POST', 'DELETE'],
         permission_classes=[IsAuthenticatedOrReadOnly],
         url_path='favorite'
     )
     def favorite(self, request, pk):
         recipe = get_object_or_404(Recipe, pk=pk)
         user = request.user
-        if request.method == 'GET':
+        if request.method == 'POST':
             favorite_recipe, created = RecipesFavorite.objects.get_or_create(
                 user=user, recipe=recipe
             )
@@ -51,13 +51,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(
         detail=True,
-        methods=['GET', 'DELETE'],
+        methods=['POST', 'DELETE'],
         permission_classes=[IsAuthenticatedOrReadOnly]
     )
     def shopping_cart(self, request, pk):
         recipe = get_object_or_404(Recipe, pk=pk)
         user = request.user
-        if request.method == 'GET':
+        if request.method == 'POST':
             recipe, created = Shoplist.objects.get_or_create(
                 user=user, recipe=recipe
             )
@@ -78,7 +78,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=('get',), detail=False)
+    @action(methods=('GET',), detail=False)
     def download_shopping_cart(self, request):
         try:
             return get_shopping_list(request)
