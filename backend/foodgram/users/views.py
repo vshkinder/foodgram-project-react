@@ -29,7 +29,8 @@ class CustomUserViewSet(UserViewSet):
     @action(
         detail=True,
         methods=['POST', 'DELETE'],
-        permission_classes=[IsAuthenticated]
+        permission_classes=[IsAuthenticated],
+        url_path='subscribe'
     )
     def subscribe(self, request, id):
         subscribing = get_object_or_404(CustomUser, id=id)
@@ -61,7 +62,7 @@ class CustomUserViewSet(UserViewSet):
 
     @action(
         detail=True,
-        methods=['POST'],
+        methods=['GET'],
         permission_classes=[IsAuthenticated],
         url_path='subscriptions'
     )
