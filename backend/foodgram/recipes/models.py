@@ -202,7 +202,12 @@ class Shoplist(models.Model):
         ordering = ('-id',)
         constraints = [
             models.UniqueConstraint(
-                fields=['recipe', 'user'],
+                fields=['user'],
                 name='unique_recipe_cart'
             )
         ]
+
+
+class TagsRecipe(models.Model):
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)

@@ -12,7 +12,7 @@ from users.models import CustomUser
 from users.serializers import UserSerializer
 
 from .models import (CountOfIngredient, Ingredient, Recipe, Shoplist,
-                     Tag, RecipesFavorite)
+                     Tag, RecipesFavorite, TagsRecipe)
 from .utils import check_value_validate
 
 
@@ -121,7 +121,10 @@ class RecipeSerializer(serializers.ModelSerializer):
     ingredients = SerializerMethodField()
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
-    image = Base64ImageField()
+    image = Base64ImageField(
+        max_length=None,
+        use_url=True,
+    )
 
     class Meta:
         model = Recipe
@@ -142,12 +145,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             'is_in_shopping_cart',
         )
 
-    def get_ingredients(self, obj):
-        ingredients = obj.ingredients.values(
-            'id', 'name', 'measurement_unit', amount=F('recipes__recipe_ingredients')
-        )
-        return ingredients
-
     def get_status_func(self, data):
         request = self.context.get('request')
         if request is None or request.user.is_anonymous:
@@ -165,87 +162,97 @@ class RecipeSerializer(serializers.ModelSerializer):
             return True
         return False
 
-    def get_is_favorited(self, obj):
-        user = self.context.get('request').user
-        if user.is_anonymous:
-            return False
-        return user.recipes_favorite.filter(id=obj.id).exists()
+    def get_is_favorited(self, data):
+        return self.get_status_func(data)
 
     def get_is_in_shopping_cart(self, data):
         return self.get_status_func(data)
 
-    def validate(self, data):
-        name = str(self.initial_data.get('name')).strip()
-        tags = self.initial_data.get('tags')
-        ingredients = self.initial_data.get('ingredients')
-        values_as_list = (tags, ingredients)
-
-        for value in values_as_list:
-            if not isinstance(value, list):
-                raise ValidationError(
-                    f'"{value}" должен быть в формате "[]"'
-                )
-
-        for tag in tags:
-            check_value_validate(tag, Tag)
-
-        valid_ingredients = []
-        for ing in ingredients:
-            ing_id = ing.get('id')
-            ingredient = check_value_validate(ing_id, Ingredient)
-
-            amount = ing.get('amount')
-            check_value_validate(amount)
-
-            valid_ingredients.append(
-                {'ingredient': ingredient, 'amount': amount}
-            )
-
-        data['name'] = name.capitalize()
-        data['tags'] = tags
-        data['ingredients'] = valid_ingredients
-        data['author'] = self.context.get('request').user
-        return data
+    #def validate(self, data):
+    #    name = str(self.initial_data.get('name')).strip()
+    #    tags = self.initial_data.get('tags')
+    #    ingredients = self.initial_data.get('ingredients')
+    #    values_as_list = (tags, ingredients)
+#
+    #    for value in values_as_list:
+    #        if not isinstance(value, list):
+    #            raise ValidationError(
+    #                f'"{value}" должен быть в формате "[]"'
+    #            )
+#
+    #    for tag in tags:
+    #        check_value_validate(tag, Tag)
+#
+    #    valid_ingredients = []
+    #    for ing in ingredients:
+    #        ing_id = ing.get('id')
+    #        ingredient = check_value_validate(ing_id, Ingredient)
+#
+    #        amount = ing.get('amount')
+    #        check_value_validate(amount)
+#
+    #        valid_ingredients.append(
+    #            {'ingredient': ingredient, 'amount': amount}
+    #        )
+#
+    #    data['name'] = name.capitalize()
+    #    data['tags'] = tags
+    #    data['ingredients'] = valid_ingredients
+    #    data['author'] = self.context.get('request').user
+    #    return data
 
     def create(self, validated_data):
-        image = validated_data.pop('image')
-        tags = validated_data.pop('tags')
-        ingredients = validated_data.pop('ingredients')
-        recipe = Recipe.objects.create(**validated_data)
-        recipe.tags.set(tags)
-        for ingredient in ingredients:
-            CountOfIngredient.objects.get_or_create(
+        context = self.context['request']
+        ingredients = validated_data.pop('recipe_ingredients')
+        try:
+            recipe = Recipe.objects.create(
+                **validated_data,
+                author=self.context.get('request').user
+            )
+        except IntegrityError as err:
+            pass
+        tags_set = context.data['tags']
+        for tag in tags_set:
+            TagsRecipe.objects.create(
                 recipe=recipe,
-                ingredients=ingredient['ingredient'],
-                amount=ingredient['amount']
+                tag=Tag.objects.get(id=tag)
+            )
+        ingredients_set = context.data['ingredients']
+        for ingredient in ingredients_set:
+            ingredient_model = Ingredient.objects.get(id=ingredient('id'))
+            CountOfIngredient.objects.create(
+                recipe=recipe,
+                ingredient=ingredient_model,
+                amount=ingredient['amount'],
             )
         return recipe
 
-    def update(self, recipe, validated_data):
-        tags = validated_data.get('tags')
-        ingredients = validated_data.get('ingredients')
+    def update(self, instance, validated_data):
+        context = self.context['request']
+        ingredients = validated_data.pop('recipe_ingredients')
+        tags_set = context.data['tags']
+        recipe = instance
+        instance.name = validated_data.get('name', instance.name)
+        instance.text = validated_data.get('text', instance.text)
+        instance.cooking_time = validated_data.get(
+            'cooking_time', instance.cooking_time
+        )
+        instance.image = validated_data.get('image', instance.image)
+        instance.save()
+        instance.tags.set(tags_set)
+        CountOfIngredient.objects.filter(recipe=instance).delete()
+        ingredients_req = context.data['ingredients']
+        for ingredient in ingredients_req:
+            ingredient_model = Ingredient.objects.get(id=ingredient['id'])
+            CountOfIngredient.objects.create(
+                recipe=recipe,
+                ingredient=ingredient_model,
+                amount=ingredient['amount'],
+            )
+        return instance
 
-        recipe.image = validated_data.get(
-            'image', recipe.image)
-        recipe.name = validated_data.get(
-            'name', recipe.name)
-        recipe.text = validated_data.get(
-            'text', recipe.text)
-        recipe.cooking_time = validated_data.get(
-            'cooking_time', recipe.cooking_time)
-
-        if tags:
-            recipe.tags.clear()
-            recipe.tags.set(tags)
-
-        if ingredients:
-            recipe.ingredients.clear()
-            for ingredient in ingredients:
-                CountOfIngredient.objects.get_or_create(
-                    recipe=recipe,
-                    ingredients=ingredient['ingredient'],
-                    amount=ingredient['amount']
-                )
-
-        recipe.save()
-        return recipe
+    def to_representation(self, instance):
+        response = super(RecipeSerializer, self).to_representation(instance)
+        if instance.image:
+            response['image'] = instance.image.url
+        return response
