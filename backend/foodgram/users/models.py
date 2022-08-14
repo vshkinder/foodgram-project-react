@@ -84,9 +84,6 @@ class Subscribe(models.Model):
         constraints = (
             models.UniqueConstraint(
                 fields=('user', 'author',),
-                name='unique_subscribe'
+                name='unique_object'
             ),
         )
-
-    def __str__(self):
-        return f'Пользователь {self.user} подписан на автора {self.author}'

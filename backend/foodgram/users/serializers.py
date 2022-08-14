@@ -2,6 +2,7 @@ from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers, validators
 
 from recipes.models import Recipe
+from recipes.serializers import RecipeSerializer
 
 from .mixins import IsSubscribedMixin
 from .models import CustomUser, Subscribe
@@ -66,3 +67,12 @@ class UserSubscribeSerializer(serializers.ModelSerializer, IsSubscribedMixin):
 
     def get_recipes_count(self, data):
         return Recipe.objects.filter(author=data).count()
+
+    def get_recipes(self, data):
+        recipes_limit = self.context.get('request').GET.get('recipes_limit')
+        recipes = (
+            data.recipes.all()[:int(recipes_limit)]
+            if recipes_limit else data.recipes
+        )
+        serializer = serializers.ListSerializer(child=RecipeSerializer())
+        return serializer.to_representation(recipes)
