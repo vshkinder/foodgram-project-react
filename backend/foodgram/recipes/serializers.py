@@ -147,6 +147,14 @@ class RecipeSerializer(serializers.ModelSerializer):
         data['ingredients'] = ingredients
         return data
 
+    def create_ingredients(self, ingredients, recipe):
+        for ingredient in ingredients:
+            CountOfIngredient.objects.create(
+                recipe=recipe,
+                ingredient_id=ingredient.get('id'),
+                amount=ingredient.get('amount'),
+            )
+
     def create(self, validated_data):
         image = validated_data.pop('image')
         context = self.context['request']
@@ -154,14 +162,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe = Recipe.objects.create(**validated_data, author=self.context.get('request').user)
         tags_data = self.initial_data.get('tags')
         recipe.tags.set(tags_data)
-        ingredients_set = context.data['ingredients']
-        for ingredient in ingredients_set:
-            ingredient_model = Ingredient.objects.get(id=ingredient('id'))
-            CountOfIngredient.objects.create(
-                recipe=recipe,
-                ingredient=ingredient_model,
-                amount=ingredient['amount'],
-            )
+        self.create_ingredients(ingredients, recipe)
         return recipe
 
     def update(self, instance, validated_data):
