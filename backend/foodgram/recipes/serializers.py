@@ -157,7 +157,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         for ingredient in ingredients:
             CountOfIngredient.objects.create(
                 recipe=recipe,
-                ingredient_id=ingredient.get('id'),
+                ingredients_id=ingredient.get('id'),
                 amount=ingredient.get('amount'),
             )
 
