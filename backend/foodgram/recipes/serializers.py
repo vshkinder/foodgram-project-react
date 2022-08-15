@@ -163,13 +163,10 @@ class RecipeSerializer(serializers.ModelSerializer):
         image = validated_data.pop('image')
         context = self.context['request']
         ingredients = validated_data.pop('recipe_ingredients')
-        try:
-            recipe = Recipe.objects.create(
+        recipe = Recipe.objects.create(
                 **validated_data,
                 author=self.context.get('request').user
             )
-        except IntegrityError as err:
-            pass
         tags_set = context.data['tags']
         for tag in tags_set:
             TagsRecipe.objects.create(
