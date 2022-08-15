@@ -2,6 +2,8 @@ from django.core import validators
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.urls import reverse
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from users.models import CustomUser
 
@@ -203,12 +205,10 @@ class Shoplist(models.Model):
     )
 
     class Meta:
+        ordering = ['-id']
         verbose_name = 'Список покупок'
         verbose_name_plural = 'Списки покупок'
-        ordering = ('-id',)
         constraints = [
-            models.UniqueConstraint(
-                fields=['recipe', 'user'],
-                name='unique_recipe_cart'
-            )
+            models.UniqueConstraint(fields=['user', 'recipe'],
+                                    name='unique cart user')
         ]
