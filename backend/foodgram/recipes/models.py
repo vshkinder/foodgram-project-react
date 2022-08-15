@@ -176,7 +176,7 @@ class CountOfIngredient(models.Model):
         ordering = ('-id',)
         constraints = (
             models.UniqueConstraint(
-                fields=('ingredients', 'recipe',),
+                fields=['ingredients', 'recipe'],
                 name='unique_ingredient_amount',
             ),
         )
