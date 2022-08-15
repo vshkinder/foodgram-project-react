@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
+from rest_framework.validators import UniqueTogetherValidator
 
 from users.models import CustomUser
 
@@ -25,22 +26,25 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class CountOfIngredientSerializer(serializers.ModelSerializer):
-    id = serializers.PrimaryKeyRelatedField(
-        queryset=Ingredient.objects.all(),
+    id = serializers.ReadOnlyField(
         source='ingredient.id'
     )
-    name = serializers.CharField(
-        read_only=True,
+    name = serializers.ReadOnlyField(
         source='ingredient.name'
     )
-    measurement_unit = serializers.CharField(
-        read_only=True,
+    measurement_unit = serializers.ReadOnlyField(
         source='ingredient.measurement_unit'
     )
 
     class Meta:
         model = CountOfIngredient
         fields = ('id', 'name', 'measurement_unit', 'amount')
+        validators = [
+            UniqueTogetherValidator(
+                queryset=CountOfIngredient.objects.all(),
+                fields=['ingredient', 'recipe']
+            )
+        ]
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -95,7 +99,9 @@ class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
     author = AuthorSerializer(read_only=True)
     ingredients = CountOfIngredientSerializer(
-        many=True, source='recipe_ingredients'
+        many=True,
+        source='countofingredient_set',
+        read_only=True,
     )
     is_favorited = SerializerMethodField()
     is_in_shopping_cart = SerializerMethodField()
