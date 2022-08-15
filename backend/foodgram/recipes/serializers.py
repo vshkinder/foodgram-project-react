@@ -171,7 +171,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         for tag in tags_set:
             TagsRecipe.objects.create(
                 recipe=recipe,
-                tag=Tag.objects.get(id=tag)
+                tags=Tag.objects.get(id=tag)
             )
         ingredients_set = context.data['ingredients']
         for ingredient in ingredients_set:
