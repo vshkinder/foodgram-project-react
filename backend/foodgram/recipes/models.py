@@ -76,7 +76,7 @@ class Recipe(models.Model):
     )
     tags = models.ManyToManyField(
         Tag,
-        through='TagsRecipe',
+        through='tagsrecipe',
         verbose_name='Тэг',
         related_name='recipes',
     )
