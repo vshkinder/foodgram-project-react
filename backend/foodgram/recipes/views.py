@@ -3,14 +3,13 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import (IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly, SAFE_METHODS)
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
-from rest_framework.status import HTTP_400_BAD_REQUEST
 
 from .filters import RecipeFilter
-from .models import Ingredient, Recipe, Shoplist, Tag, RecipesFavorite, CountOfIngredient
-from .permissions import IsAuthorOrAdminOrReadOnly, AuthorOrReadOnly
-from .serializers import (FavoriteSerializer, IngredientSerializer,
+from .models import Ingredient, Recipe, Shoplist, Tag, RecipesFavorite
+from .permissions import AuthorOrReadOnly
+from .serializers import (IngredientSerializer,
                           RecipeSerializer, SimpleRecipeSerializer, TagSerializer)
 from .utils import get_shopping_list
 
