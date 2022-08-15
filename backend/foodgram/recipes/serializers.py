@@ -8,7 +8,7 @@ from rest_framework.fields import SerializerMethodField
 from users.models import CustomUser
 
 from .models import (CountOfIngredient, Ingredient, Recipe, Shoplist,
-                     Tag, RecipesFavorite, TagsRecipe)
+                     Tag, RecipesFavorite)
 
 
 class AuthorSerializer(serializers.ModelSerializer):
@@ -163,16 +163,12 @@ class RecipeSerializer(serializers.ModelSerializer):
         image = validated_data.pop('image')
         context = self.context['request']
         ingredients = validated_data.pop('recipe_ingredients')
+        tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(
                 **validated_data,
                 author=self.context.get('request').user
             )
-        tags_set = context.data['tags']
-        for tag in tags_set:
-            TagsRecipe.objects.create(
-                recipe=recipe,
-                tag=Tag.objects.get(id=tag)
-            )
+        recipe.tags.set(tags)
         ingredients_set = context.data['ingredients']
         for ingredient in ingredients_set:
             ingredient_model = Ingredient.objects.get(id=ingredient('id'))
