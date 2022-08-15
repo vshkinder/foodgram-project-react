@@ -1,62 +1,33 @@
-from django.db.models import IntegerField, Value
-from django_filters.rest_framework import (AllValuesMultipleFilter,
-                                           BooleanFilter, CharFilter,
-                                           FilterSet)
+from django_filters import rest_framework as filters
 
-from .models import Ingredient, Recipe, Shoplist, RecipesFavorite
+from .models import Recipe, Tag
 
 
-class IngredientSearchFilter(FilterSet):
-    name = CharFilter(method='search_by_name')
+class RecipeFilter(filters.FilterSet):
+    tags = filters.filters.ModelMultipleChoiceFilter(
+        queryset=Tag.objects.all(),
+        field_name='tags__slug',
+        to_field_name='slug',
+    )
+    author = filters.CharFilter(lookup_expr='exact')
+    is_in_shopping_cart = filters.BooleanFilter(
+        field_name='is_in_shopping_cart', method='filter'
+    )
+    is_favorited = filters.BooleanFilter(
+        field_name='is_favorited', method='filter'
+    )
 
-    class Meta:
-        model = Ingredient
-        fields = ('name',)
-
-    def search_by_name(self, queryset, name, value):
-        if not value:
-            return queryset
-        start_with_queryset = (
-            queryset.filter(name__istartswith=value).annotate(
-                order=Value(0, IntegerField())
+    def filter(self, queryset, name, value):
+        if name == 'is_in_shopping_cart' and value:
+            queryset = queryset.filter(
+                shopping_cart__user=self.request.user
             )
-        )
-        contain_queryset = (
-            queryset.filter(name__icontains=value).exclude(
-                pk__in=(ingredient.pk for ingredient in start_with_queryset)
-            ).annotate(
-                order=Value(1, IntegerField())
+        if name == 'is_favorited' and value:
+            queryset = queryset.filter(
+                recipes_favorite__user=self.request.user
             )
-        )
-        return start_with_queryset.union(contain_queryset).order_by('order')
-
-
-class RecipeFilter(FilterSet):
-    is_favorited = BooleanFilter(method='get_is_favorited')
-    is_in_shopping_cart = BooleanFilter(method='get_is_in_shopping_cart')
-    tags = AllValuesMultipleFilter(field_name='tags__slug')
+        return queryset
 
     class Meta:
         model = Recipe
-        fields = ('author',)
-
-    def get_is_favorited(self, queryset, name, value):
-        if not value:
-            return queryset
-        favorites = self.request.user.recipe_favotite.all()
-        return queryset.filter(
-            pk__in=(favorite.recipe.pk for favorite in favorites)
-        )
-
-    def get_is_in_shopping_cart(self, queryset, name, value):
-        if not value:
-            return queryset
-        try:
-            recipes = (
-                self.request.user.shopping_cart.recipes.all()
-            )
-        except Shoplist.DoesNotExist:
-            return queryset
-        return queryset.filter(
-            pk__in=(recipe.pk for recipe in recipes)
-        )
+        fields = ['author', 'tags', 'is_in_shopping_cart', 'is_favorited']
