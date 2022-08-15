@@ -211,5 +211,5 @@ class Shoplist(models.Model):
 
 
 class TagsRecipe(models.Model):
-    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
+    tags = models.ForeignKey(Tag, on_delete=models.CASCADE)
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
