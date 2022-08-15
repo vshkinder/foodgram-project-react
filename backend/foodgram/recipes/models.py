@@ -76,7 +76,7 @@ class Recipe(models.Model):
     )
     tags = models.ManyToManyField(
         Tag,
-        through='tagsrecipe',
+        through='TagsRecipe',
         verbose_name='Тэг',
         related_name='recipes',
     )
@@ -117,6 +117,11 @@ class Recipe(models.Model):
 
     def get_absolute_url(self):
         return reverse('recipe', args=[self.pk])
+
+
+class TagsRecipe(models.Model):
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
 
 
 class RecipesFavorite(models.Model):
@@ -208,8 +213,3 @@ class Shoplist(models.Model):
                 name='unique_recipe_cart'
             )
         ]
-
-
-class TagsRecipe(models.Model):
-    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
