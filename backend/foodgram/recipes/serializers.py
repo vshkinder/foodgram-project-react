@@ -160,6 +160,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         return self.get_status_func(data)
 
     def create(self, validated_data):
+        image = validated_data.pop('image')
         context = self.context['request']
         ingredients = validated_data.pop('recipe_ingredients')
         try:
