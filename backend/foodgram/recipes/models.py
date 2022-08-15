@@ -63,7 +63,7 @@ class Recipe(models.Model):
     author = models.ForeignKey(
         CustomUser,
         on_delete=models.CASCADE,
-        related_name='recipe',
+        related_name='recipes',
         verbose_name='Автор'
     )
     name = models.CharField(
@@ -76,8 +76,9 @@ class Recipe(models.Model):
     )
     tags = models.ManyToManyField(
         Tag,
+        through='TagsRecipe',
         verbose_name='Тэг',
-        related_name='recipe',
+        related_name='recipes',
     )
     ingredients = models.ManyToManyField(
         Ingredient,
