@@ -129,7 +129,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         image = validated_data.pop('image')
         context = self.context['request']
         ingredients = validated_data.pop('recipe_ingredients')
-        recipe = Recipe.objects.create(image=image, **validated_data)
+        recipe = Recipe.objects.create(**validated_data)
         tags_data = self.initial_data.get('tags')
         recipe.tags.set(tags_data)
         ingredients_set = context.data['ingredients']
