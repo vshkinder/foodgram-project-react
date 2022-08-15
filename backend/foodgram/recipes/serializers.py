@@ -27,13 +27,13 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 class CountOfIngredientSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(
-        source='ingredient.id'
+        source='ingredients.id'
     )
     name = serializers.ReadOnlyField(
-        source='ingredient.name'
+        source='ingredients.name'
     )
     measurement_unit = serializers.ReadOnlyField(
-        source='ingredient.measurement_unit'
+        source='ingredients.measurement_unit'
     )
 
     class Meta:
