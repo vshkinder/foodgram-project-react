@@ -1,10 +1,14 @@
-#from django.core.exceptions import ValidationError
-#import django_filters as filters
-#
-#from .models import Recipe, Tag, Ingredient
-#from users.models import CustomUser
-#
-#
+from django.core.exceptions import ValidationError
+import django_filters as filters
+
+from .models import Recipe, Tag, Ingredient
+from users.models import CustomUser
+
+
+class RecipeFilter(filters.FilterSet):
+    pass
+
+
 #class TagsMultipleChoiceField(
 #        filters.fields.MultipleChoiceField):
 #    def validate(self, value):
