@@ -54,7 +54,9 @@ class CustomUserViewSet(UserViewSet):
             'errors': 'Вы уже отписались'
         }, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=['GET'], permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=['GET'],
+            permission_classes=[IsAuthenticated],
+            url_path='subscriptions')
     def subscriptions(self, request):
         user = request.user
         queryset = Subscribe.objects.filter(user=user)
