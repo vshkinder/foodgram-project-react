@@ -54,10 +54,9 @@ class CustomUserViewSet(UserViewSet):
             'errors': 'Вы уже отписались'
         }, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=['GET'],
-            permission_classes=[IsAuthenticated],
-            url_path='subscriptions')
-    def get_subscriptions(self, request):
+    @action(detail=True, methods=['GET'],
+            permission_classes=[IsAuthenticated])
+    def subscriptions(self, request):
         user = request.user
         queryset = Subscribe.objects.filter(user=user)
         pages = self.paginate_queryset(queryset)
@@ -66,4 +65,4 @@ class CustomUserViewSet(UserViewSet):
             many=True,
             context={'request': request}
         )
-        return serializer.data
+        return self.get_paginated_response(serializer.data)
