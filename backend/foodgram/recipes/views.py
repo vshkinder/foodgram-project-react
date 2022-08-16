@@ -21,10 +21,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filter_class = RecipeFilter
     permission_classes = [AuthorOrReadOnly]
 
-    @action(detail=True, methods=['get', 'delete'],
+    @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
     def favorite(self, request, pk=None):
-        if request.method == 'GET':
+        if request.method == 'POST':
             return self.add_obj(RecipesFavorite, request.user, pk)
         elif request.method == 'DELETE':
             return self.delete_obj(RecipesFavorite, request.user, pk)
@@ -32,11 +32,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(
         detail=True,
-        methods=['GET', 'DELETE'],
+        methods=['POST', 'DELETE'],
         permission_classes=[IsAuthenticated]
     )
     def shopping_cart(self, request, pk):
-        if request.method == 'GET':
+        if request.method == 'POST':
             return self.add_obj(Shoplist, request.user, pk)
         elif request.method == 'DELETE':
             return self.delete_obj(Shoplist, request.user, pk)
