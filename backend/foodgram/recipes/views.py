@@ -15,7 +15,6 @@ from .models import Ingredient, Recipe, Shoplist, Tag, RecipesFavorite, CountOfI
 from .permissions import AuthorOrReadOnly
 from .serializers import (IngredientSerializer,
                           RecipeSerializer, SimpleRecipeSerializer, TagSerializer)
-from .utils import get_shopping_list
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
