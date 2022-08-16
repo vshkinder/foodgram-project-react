@@ -10,7 +10,6 @@ from rest_framework.serializers import ListSerializer
 from recipes.serializers import SubscribeSerializer
 from .models import CustomUser, Subscribe
 from .pagination import LimitPageNumberPagination
-from .serializers import UserSerializer, UserSubscribeSerializer
 
 User = CustomUser()
 
