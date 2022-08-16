@@ -100,7 +100,6 @@ class RecipeSerializer(serializers.ModelSerializer):
     author = AuthorSerializer(read_only=True)
     ingredients = CountOfIngredientSerializer(
         many=True,
-        source='countofingredient_set',
         read_only=True,
     )
     is_favorited = SerializerMethodField()
