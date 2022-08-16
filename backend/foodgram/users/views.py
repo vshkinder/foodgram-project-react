@@ -7,7 +7,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.serializers import ListSerializer
 
-from recipes.serializers import SubscribeSerializer
+from .serializers import SubscribeSerializer
 from .models import CustomUser, Subscribe
 from .pagination import LimitPageNumberPagination
 
@@ -20,7 +20,7 @@ class CustomUserViewSet(UserViewSet):
     @action(detail=True, permission_classes=[IsAuthenticated])
     def subscribe(self, request, id=None):
         user = request.user
-        author = get_object_or_404(User, id=id)
+        author = get_object_or_404(CustomUser, id=id)
 
         if user == author:
             return Response({
