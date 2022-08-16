@@ -1,33 +1,26 @@
 import django_filters as filters
 
 from .models import Recipe, Tag
+from users.models import CustomUser
 
 
 class RecipeFilter(filters.FilterSet):
-    tags = filters.filters.AllValuesMultipleFilter(
-        queryset=Tag.objects.all(),
-        field_name='tags__slug',
-        to_field_name='slug',
-    )
-    author = filters.CharFilter(lookup_expr='exact')
+    tags = filters.AllValuesMultipleFilter(field_name='tags__slug')
+    author = filters.ModelChoiceFilter(queryset=CustomUser.objects.all())
+    is_favorited = filters.BooleanFilter(method='filter_is_favorited')
     is_in_shopping_cart = filters.BooleanFilter(
-        field_name='is_in_shopping_cart', method='filter'
-    )
-    is_favorited = filters.BooleanFilter(
-        field_name='is_favorited', method='filter'
-    )
+        method='filter_is_in_shopping_cart')
 
-    def filter(self, queryset, name, value):
-        if name == 'is_in_shopping_cart' and value:
-            queryset = queryset.filter(
-                shopping_cart__user=self.request.user
-            )
-        if name == 'is_favorited' and value:
-            queryset = queryset.filter(
-                recipes_favorite__user=self.request.user
-            )
+    def filter_is_favorited(self, queryset, name, value):
+        if value and not self.request.user.is_anonymous:
+            return queryset.filter(recipes_favorite__user=self.request.user)
+        return queryset
+
+    def filter_is_in_shopping_cart(self, queryset, name, value):
+        if value and not self.request.user.is_anonymous:
+            return queryset.filter(shopping_cart__user=self.request.user)
         return queryset
 
     class Meta:
         model = Recipe
-        fields = ['author', 'tags', 'is_in_shopping_cart', 'is_favorited']
+        fields = ('tags', 'author')
