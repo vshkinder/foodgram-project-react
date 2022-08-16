@@ -6,9 +6,7 @@ from .views import CustomUserViewSet
 app_name = 'users'
 
 router = DefaultRouter()
-router.register(r'users', CustomUserViewSet, basename='users')
-
-subscriptions = CustomUserViewSet.as_view({'get': 'subscriptions', })
+router.register('users', CustomUserViewSet)
 
 urlpatterns = [
     path('', include('djoser.urls')),
