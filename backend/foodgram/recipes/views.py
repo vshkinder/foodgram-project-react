@@ -21,7 +21,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_class = RecipeFilter
+    filter_class = RecipeFilter
     permission_classes = [AuthorOrReadOnly]
 
     @action(detail=True, methods=['post', 'delete'],

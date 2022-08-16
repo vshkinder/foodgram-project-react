@@ -115,10 +115,10 @@ class RecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         exclude = ('pub_date',)
- #       read_only_fields = (
- #           'is_favorite',
- #           'is_in_shopping_cart',
- #       )
+        read_only_fields = (
+            'is_favorited',
+            'is_in_shopping_cart',
+        )
 
     def get_is_favorited(self, obj):
         user = self.context.get('request').user
