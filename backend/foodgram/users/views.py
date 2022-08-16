@@ -7,80 +7,62 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.serializers import ListSerializer
 
+from recipes.serializers import SubscribeSerializer
 from .models import CustomUser, Subscribe
+from .pagination import LimitPageNumberPagination
 from .serializers import UserSerializer, UserSubscribeSerializer
 
 User = CustomUser()
 
 
 class CustomUserViewSet(UserViewSet):
-    queryset = CustomUser.objects.all()
-    serializer_class = UserSerializer
+    pagination_class = LimitPageNumberPagination
 
-    def get_permissions(self):
-        if self.action == 'create':
-            permission_classes = [IsAuthenticated]
-        elif self.action == 'actioned':
-            permission_classes = [IsAuthenticated]
-        else:
-            permission_classes = [AllowAny]
-        return [permission() for permission in permission_classes]
+    @action(detail=True, permission_classes=[IsAuthenticated])
+    def subscribe(self, request, id=None):
+        user = request.user
+        author = get_object_or_404(User, id=id)
 
-    @action(
-        detail=True,
-        methods=['POST', 'DELETE'],
-        permission_classes=[IsAuthenticated],
-        url_path='subscribe'
-    )
-    def subscribe(self, request, id):
-        subscribing = get_object_or_404(CustomUser, id=id)
-        subscriber = request.user
+        if user == author:
+            return Response({
+                'errors': 'Вы не можете подписываться на самого себя'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        if Subscribe.objects.filter(user=user, author=author).exists():
+            return Response({
+                'errors': 'Вы уже подписаны на данного пользователя'
+            }, status=status.HTTP_400_BAD_REQUEST)
 
-        if request.method == 'POST':
-            subscribed = (Subscribe.objects.filter(
-                author=subscribing, user=subscriber).exists()
-            )
-            if subscribed is True:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
-            Subscribe.objects.get_or_create(
-                user=subscriber,
-                author=subscribing
-            )
-            serializer = UserSubscribeSerializer(
-                context=self.get_serializer_context()
-            )
-            return Response(serializer.to_representation(
-                instance=subscribing),
-                status=status.HTTP_201_CREATED
-            )
-        if request.method == 'DELETE':
-            Subscribe.objects.filter(
-                user=subscriber, author=subscribing
-            ).delete()
+        follow = Subscribe.objects.create(user=user, author=author)
+        serializer = SubscribeSerializer(
+            follow, context={'request': request}
+        )
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @subscribe.mapping.delete
+    def del_subscribe(self, request, id=None):
+        user = request.user
+        author = get_object_or_404(User, id=id)
+        if user == author:
+            return Response({
+                'errors': 'Вы не можете отписываться от самого себя'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        follow = Subscribe.objects.filter(user=user, author=author)
+        if follow.exists():
+            follow.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    @action(
-        detail=True,
-        methods=['GET'],
-        permission_classes=[IsAuthenticated],
-        url_path='subscriptions'
-    )
+        return Response({
+            'errors': 'Вы уже отписались'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, permission_classes=[IsAuthenticated])
     def subscriptions(self, request):
-        current_user = request.user
-        followed_list = CustomUser.objects.filter(
-            subscribing__user=current_user
+        user = request.user
+        queryset = Subscribe.objects.filter(user=user)
+        pages = self.paginate_queryset(queryset)
+        serializer = SubscribeSerializer(
+            pages,
+            many=True,
+            context={'request': request}
         )
-        paginator = PageNumberPagination()
-        paginator.page_size_query_param = 'limit'
-        authors = paginator.paginate_queryset(
-            followed_list,
-            request=request
-        )
-        serializer = ListSerializer(
-            child=UserSubscribeSerializer(),
-            context=self.get_serializer_context()
-        )
-        return paginator.get_paginated_response(
-            serializer.to_representation(authors)
-        )
+        return self.get_paginated_response(serializer.data)
