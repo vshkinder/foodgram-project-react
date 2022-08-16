@@ -28,7 +28,7 @@ class CustomUserViewSet(UserViewSet):
 
     @action(
         detail=True,
-        methods=['POST', 'DELETE'],
+        methods=['GET', 'DELETE'],
         permission_classes=[IsAuthenticated],
         url_path='subscribe'
     )
@@ -36,7 +36,7 @@ class CustomUserViewSet(UserViewSet):
         subscribing = get_object_or_404(CustomUser, id=id)
         subscriber = request.user
 
-        if request.method == 'POST':
+        if request.method == 'GET':
             subscribed = (Subscribe.objects.filter(
                 author=subscribing, user=subscriber).exists()
             )
