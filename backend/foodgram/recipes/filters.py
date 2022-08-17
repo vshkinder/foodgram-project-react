@@ -1,7 +1,7 @@
 import django_filters as filters
 from django_filters.widgets import BooleanWidget
 
-from .models import Recipe, Tag
+from recipes.models import Recipe
 from users.models import CustomUser
 
 
@@ -30,12 +30,12 @@ class RecipeFilter(filters.FilterSet):
 
     def filter_is_favorited(self, queryset, name, value):
         if value:
-            return queryset.filter(is_favorited=self.request.user)
+            return queryset.filter(recipes_favorite__user=self.request.user)
         return queryset
 
     def filter_is_in_shopping_cart(self, queryset, name, value):
         if value:
-            return queryset.filter(is_in_shopping_cart=self.request.user)
+            return queryset.filter(shopping_cart__user=self.request.user)
         return queryset
 
     class Meta:
