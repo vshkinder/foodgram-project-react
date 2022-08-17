@@ -9,8 +9,8 @@ def get_shopping_list(request):
     shopping_list = {}
     for item in shopping_cart:
         for recipe_ingredient in item.recipe.recipe_ingredients.all():
-            name = recipe_ingredient.ingredient.name
-            measuring_unit = recipe_ingredient.ingredient.measurement_unit
+            name = recipe_ingredient.ingredients.name
+            measuring_unit = recipe_ingredient.ingredients.measurement_unit
             amount = recipe_ingredient.amount
             if name not in shopping_list:
                 shopping_list[name] = {
