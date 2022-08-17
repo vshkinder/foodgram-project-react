@@ -20,7 +20,7 @@ from .serializers import (IngredientSerializer,
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-    filter_class = RecipeFilter
+    filterset_class = RecipeFilter
 #    filter_backends = [DjangoFilterBackend]
     permission_classes = [AuthorOrReadOnly]
 
