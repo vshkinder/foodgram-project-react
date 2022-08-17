@@ -1,4 +1,5 @@
 import django_filters as filters
+from django_filters.widgets import BooleanWidget
 
 from .models import Recipe, Tag
 from users.models import CustomUser
