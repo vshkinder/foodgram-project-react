@@ -18,11 +18,18 @@ from .serializers import (IngredientSerializer,
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    queryset = Recipe.objects.all()
+#    queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     filter_backends = (DjangoFilterBackend,)
-    filterset_class = RecipeFilter
+#    filterset_class = RecipeFilter
     permission_classes = [AuthorOrReadOnly]
+
+    def get_queryset(self):
+        queryset = Recipe.objects.all()
+        is_favorited = self.request.query_params.get('is_favorited')
+        if is_favorited:
+            queryset = queryset.filter(recipes_favorite__user=self.request.user)
+        return queryset
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
