@@ -9,10 +9,10 @@ class RecipeFilter(filters.FilterSet):
     author = filters.ModelChoiceFilter(
         queryset=CustomUser.objects.all())
     is_in_shopping_cart = filters.BooleanFilter(
-        widget=filters.widgets.BooleanWidget(),
+        widget=BooleanWidget(),
         label='В корзине.')
     is_favorited = filters.BooleanFilter(
-        widget=filters.widgets.BooleanWidget(),
+        widget=BooleanWidget(),
         label='В избранных.')
     tags = filters.AllValuesMultipleFilter(
         field_name='tags__slug',
