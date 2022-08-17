@@ -10,6 +10,7 @@ from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 
+from .utils import get_shopping_list
 from .filters import TagsFilter
 from .models import Ingredient, Recipe, Shoplist, Tag, RecipesFavorite, CountOfIngredient
 from .permissions import AuthorOrReadOnly
@@ -32,7 +33,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if is_in_shopping_cart:
             queryset = queryset.filter(shopping_cart__user=self.request.user)
         return queryset
-
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -60,38 +60,39 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     @action(methods=('GET',), detail=False)
     def download_shopping_cart(self, request):
-        shop_list = {}
-        ingredients = CountOfIngredient.objects.filter(
-            recipe__shopping_cart__user=request.user).values_list(
-            'ingredients__name', 'ingredients__measurement_unit',
-            'amount'
-        )
-        for item in ingredients:
-            name = item[0]
-            if name not in shop_list:
-                shop_list[name] = {
-                    'measurement_unit': item[1],
-                    'amount': item[2]
-                }
-            else:
-                shop_list[name]['amount'] += item[2]
-#        pdfmetrics.registerFont(
-#            TTFont('FUTURAM', 'FUTURAM.ttf', 'UTF-8'))
-        response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = ('attachment; '
-                                           'filename="shopping_list.pdf"')
-        page = canvas.Canvas(response)
-#        page.setFont('FUTURAM', size=24)
-        page.drawString(200, 800, 'Список ингредиентов')
-#       page.setFont('FUTURAM', size=16)
-        height = 750
-        for i, (name, data) in enumerate(shop_list.items(), 1):
-            page.drawString(75, height, (f'<{i}> {name} - {data["amount"]}, '
-                                         f'{data["measurement_unit"]}'))
-            height -= 25
-        page.showPage()
-        page.save()
-        return response
+        return get_shopping_list(request)
+#        shop_list = {}
+#        ingredients = CountOfIngredient.objects.filter(
+#            recipe__shopping_cart__user=request.user).values_list(
+#            'ingredients__name', 'ingredients__measurement_unit',
+#            'amount'
+#        )
+#        for item in ingredients:
+#            name = item[0]
+#            if name not in shop_list:
+#                shop_list[name] = {
+#                    'measurement_unit': item[1],
+#                    'amount': item[2]
+#                }
+#            else:
+#                shop_list[name]['amount'] += item[2]
+##        pdfmetrics.registerFont(
+##            TTFont('FUTURAM', 'FUTURAM.ttf', 'UTF-8'))
+#        response = HttpResponse(content_type='application/pdf')
+#        response['Content-Disposition'] = ('attachment; '
+#                                           'filename="shopping_list.pdf"')
+#        page = canvas.Canvas(response)
+##        page.setFont('FUTURAM', size=24)
+#        page.drawString(200, 800, 'Список ингредиентов')
+##       page.setFont('FUTURAM', size=16)
+#        height = 750
+#        for i, (name, data) in enumerate(shop_list.items(), 1):
+#            page.drawString(75, height, (f'<{i}> {name} - {data["amount"]}, '
+#                                         f'{data["measurement_unit"]}'))
+#            height -= 25
+#        page.showPage()
+#        page.save()
+#        return response
 
     def add_obj(self, model, user, pk):
         if model.objects.filter(user=user, recipe__id=pk).exists():
