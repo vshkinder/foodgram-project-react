@@ -18,10 +18,9 @@ from .serializers import (IngredientSerializer,
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-#    queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     filter_backends = (DjangoFilterBackend,)
-#    filterset_class = RecipeFilter
+    filterset_class = RecipeFilter
     permission_classes = [AuthorOrReadOnly]
 
     def get_queryset(self):
