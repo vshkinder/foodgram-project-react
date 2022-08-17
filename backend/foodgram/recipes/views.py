@@ -10,7 +10,7 @@ from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 
-from .filters import RecipeFilter
+from .filters import TagsFilter
 from .models import Ingredient, Recipe, Shoplist, Tag, RecipesFavorite, CountOfIngredient
 from .permissions import AuthorOrReadOnly
 from .serializers import (IngredientSerializer,
@@ -20,7 +20,7 @@ from .serializers import (IngredientSerializer,
 class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializer
     filter_backends = (DjangoFilterBackend,)
-    filterset_class = RecipeFilter
+    filterset_class = TagsFilter
     permission_classes = [AuthorOrReadOnly]
 
     def get_queryset(self):
