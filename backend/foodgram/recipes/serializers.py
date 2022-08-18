@@ -1,16 +1,12 @@
-import traceback
-
-from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from rest_framework.validators import UniqueTogetherValidator
 
-from users.models import CustomUser, Subscribe
+from users.models import CustomUser
 
-from .models import (CountOfIngredient, Ingredient, Recipe, Shoplist,
-                     Tag, RecipesFavorite)
+from .models import CountOfIngredient, Ingredient, Recipe, RecipesFavorite, Tag
 
 
 class AuthorSerializer(serializers.ModelSerializer):
